@@ -12,7 +12,7 @@ for line in sys.stdin:
     raw_messages = subprocess.check_output(
         ['git', 'show', '--format=%s', '-s', "%s..%s" % (remote_sha1, local_sha1)]
     )
-    commit_msgs = raw_messages.decode('utf-8').splitlines()[0:-1]
+    commit_msgs = raw_messages.decode('utf-8').splitlines()
 
 display_name = ''
 username = ''
