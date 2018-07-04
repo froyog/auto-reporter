@@ -43,7 +43,6 @@ def main(argv):
             return
 
 title = '## %s\r\n' % display_name
-
 AT = ReportSender(username, password)
 AT.get_content()
 report_array = re.split(r'## %s\r\n' % display_name, AT.old_content)
