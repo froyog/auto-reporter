@@ -1,27 +1,13 @@
-#!/usr/bin/env python
-
 import sys
 import subprocess
 import getopt
 import re
 from sender import ReportSender
 
-commit_msgs = []
-for line in sys.stdin:
-    local_ref, local_sha1, remote_ref, remote_sha1 = line.strip().split(' ')
-    raw_messages = subprocess.check_output(
-        ['git', 'show', '--format=%s', '-s', "%s..%s" % (remote_sha1, local_sha1)]
-    )
-    decoded_messages = raw_messages.decode('utf-8').splitlines()
-    if len(raw_messages) == 1:
-        commit_msgs = decoded_messages
-    else:
-        commit_msgs = decoded_messages[0:-1]
-
-display_name = ''
-username = ''
-password = ''
-def main(argv):
+def get_params(argv):
+    display_name = ''
+    username = ''
+    password = ''
     try:
         opts, args = getopt.getopt(
             argv, 
@@ -35,36 +21,61 @@ def main(argv):
     for opt, arg in opts:
         if opt in ('-h', '--help'):
             print('Usage:')
-            return
+            sys.exit(0)
         if opt in ('-d', '--display-name'):
-            display_name = opt
+            display_name = arg
         if opt in ('-u', '--username'):
-            username = opt
+            username = arg
         if opt in ('-p', '--password'):
-            password = opt
+            password = arg
         if opt == '--thanks':
             print('mua')
-            return
+            sys.exit(0)
 
-title = '## %s\r\n' % display_name
-AT = ReportSender(username, password)
-AT.get_content()
-report_array = re.split(r'## %s\r\n' % display_name, AT.old_content)
+    return (display_name, username, password)
 
-body_string = ''
-for commit_msg in commit_msgs:
-    body_string = body_string + '- %s\r\n' % commit_msg
+def get_commit_msgs():
+    for line in sys.stdin:
+        local_ref, local_sha1, remote_ref, remote_sha1 = line.strip().split(' ')
+        raw_messages = subprocess.check_output(
+            ['git', 'show', '--format=%s', '-s', "%s..%s" % (remote_sha1, local_sha1)]
+        )
+        return raw_messages.decode('utf-8').splitlines()
+    return None
 
-if len(report_array) == 1:
-    # no title found
-    # append title
-    report_array.append('\r\n%s' % title)
-    report_array.append(body_string)
-elif len(report_array) == 2:
-    # found title
-    report_array.insert(1, title)
-    report_array.insert(2, body_string)
-else:
-    raise ValueError('strange thing happend')
+def generate_report(report_array, title, body):
+    new_report_array = report_array[:]
+    if len(report_array) == 1:
+        # no title found
+        # append title
+        new_report_array.append('\r\n%s' % title)
+        new_report_array.append(body)
+        return new_report_array
+    elif len(report_array) == 2:
+        # found title
+        new_report_array.insert(1, title)
+        new_report_array.insert(2, body)
+        return new_report_array
+    else:
+        raise
 
-AT.write(''.join(report_array))
+def main(argv):
+    display_name, username, password = get_params(argv)
+    if not username or not password:
+        print('username and password must be specificated.')
+    commit_msgs = get_commit_msgs()
+    if not commit_msgs or len(commit_msgs) == 0:
+        print('Nothing to push. Did you commit before pushing?')
+    
+    title = '## %s\r\n' % display_name
+    AT = ReportSender(username, password)
+    AT.get_content()
+    report_array = re.split(r'## %s\r\n' % display_name, AT.old_content)
+
+    body_string = ''
+    for commit_msg in commit_msgs:
+        body_string = body_string + '- %s\r\n' % commit_msg
+
+    new_report_array = generate_report(report_array, title, body_string)
+    new_report = ''.join(new_report_array)
+    AT.write(new_report)
