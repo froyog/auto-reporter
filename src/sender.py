@@ -4,6 +4,15 @@ import http.cookiejar
 from html.parser import HTMLParser
 
 
+class ATError(Exception):
+    def __init__(self, error_msg):
+        super().__init__(self)
+        self.error_msg = error_msg
+
+    def __str__(self):
+        return self.error_msg
+
+
 class TokenParser(HTMLParser):
     def __init__(self):
         HTMLParser.__init__(self)
@@ -66,11 +75,13 @@ class ReportSender:
 
     def login(self, username, password):
         url = 'https://at.twtstudio.com/login'
+        print('Loggin into %s...' % url)
 
         token_res = self.opener.open(url)
         token = self.parse_token(token_res.read().decode('utf-8'))
         if not token:
-            raise TypeError('token not found')
+            print('Failed to parse token from %s. Aborting' % url)
+            raise ATError('token not found')
         data = {
             'token': token,
             'username': username,
@@ -78,24 +89,37 @@ class ReportSender:
         }
         post_data = urllib.parse.urlencode(data).encode('utf-8')
         login_req = urllib.request.Request(url, data=post_data, method='POST')
-        self.opener.open(login_req)
+        try:
+            self.opener.open(login_req)
+        except Exception as e:
+            raise ATError(e)
 
     def get_content(self):
         url = 'https://at.twtstudio.com/report/write'
+        print('Fetching present weekly report...')
+
         request = urllib.request.Request(url)
         response = self.opener.open(request).read().decode('utf-8')
         write_token = self.parse_token(response)
+        if not write_token:
+            print('Failed to parse token from %s. Aborting...' % url)
+            raise ATError('token not found')
         old_content = self.parse_content(response)
         self.old_content = old_content
         self.write_token = write_token
 
     def write(self, content):
         url = 'https://at.twtstudio.com/report'
+        print('Writing report with your commit messages...')
+
         data = {
             'token': self.write_token,
             'content': content
         }
         post_data = urllib.parse.urlencode(data).encode('utf-8')
         request = urllib.request.Request(url, data=post_data, method='POST')
-        self.opener.open(request)
+        try:
+            self.opener.open(request)
+        except Exception as e:
+            raise ATError(e)
     

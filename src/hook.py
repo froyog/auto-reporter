@@ -3,6 +3,7 @@ import subprocess
 import getopt
 import re
 from sender import ReportSender
+from sender import ATError
 
 def get_params(argv):
     display_name = ''
@@ -67,15 +68,31 @@ def main(argv):
     if not commit_msgs or len(commit_msgs) == 0:
         print('Nothing to push. Did you commit before pushing?')
     
-    title = '## %s\r\n' % display_name
-    AT = ReportSender(username, password)
-    AT.get_content()
-    report_array = re.split(r'## %s\r\n' % display_name, AT.old_content)
+    try:
+        title = '## %s\r\n' % display_name
+        AT = ReportSender(username, password)
+        AT.get_content()
+        report_array = re.split(r'## %s\r\n' % display_name, AT.old_content)
 
-    body_string = ''
-    for commit_msg in commit_msgs:
-        body_string = body_string + '- %s\r\n' % commit_msg
+        body_string = ''
+        for commit_msg in commit_msgs:
+            body_string = body_string + '- %s\r\n' % commit_msg
 
-    new_report_array = generate_report(report_array, title, body_string)
-    new_report = ''.join(new_report_array)
-    AT.write(new_report)
+        new_report_array = generate_report(report_array, title, body_string)
+        new_report = ''.join(new_report_array)
+        AT.write(new_report)
+    except ATError as e:
+        print('Something bad happens:\n%s' % e)
+        print('But you can still trying to push your commit to your remote server.')
+        print('Notice: If you choose to continue, auto-reporter will NOT recive these commits next time, you\'ll have to manually add them to your report.')
+        continue_push = input('Continue? [Y/n]').lower()
+        valid = {
+            '': True,
+            'y': True,
+            'ye': True,
+            'yes': True,
+            'n': False,
+            'no': False
+        }
+        if not valid[continue_push]:
+            sys.exit(1)
