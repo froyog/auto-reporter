@@ -22,6 +22,7 @@ def get_params(argv):
     for opt, arg in opts:
         if opt in ('-h', '--help'):
             print('Usage:')
+            print('install-auto-reporter -u <username> -p <password> -d <project-display-name>')
             sys.exit(0)
         if opt in ('-d', '--display-name'):
             display_name = arg
