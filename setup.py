@@ -17,8 +17,8 @@ DESCRIPTION = 'Post git commit messages to AT weekly report automatically'
 URL = 'https://github.com/froyog/auto-reporter'
 EMAIL = 'scarlet0345@gmail.com'
 AUTHOR = 'froyog'
-REQUIRES_PYTHON = '>=3.0.0'
-VERSION = '0.1.6'
+REQUIRES_PYTHON = '>=3.3.0'
+VERSION = '0.1.7'
 
 # What packages are required for this module to be executed?
 REQUIRED = [
