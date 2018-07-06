@@ -4,6 +4,7 @@ import urllib.error
 import http.cookiejar
 from html.parser import HTMLParser
 
+USER_AGENT = 'Python-urllib/3.6 AutoReporter/0.1.5'
 
 class ATError(Exception):
     def __init__(self, error_msg):
@@ -91,6 +92,7 @@ class ReportSender:
             }
             post_data = urllib.parse.urlencode(data).encode('utf-8')
             login_req = urllib.request.Request(url, data=post_data, method='POST')
+            login_req.add_header("User-Agent", USER_AGENT)
             self.opener.open(login_req)
         except Exception as e:
             raise ATError(str(e))
@@ -100,6 +102,7 @@ class ReportSender:
         print('Fetching present weekly report...')
         try:
             request = urllib.request.Request(url)
+            request.add_header("User-Agent", USER_AGENT)
             response = self.opener.open(request).read().decode('utf-8')
             write_token = self.parse_token(response)
         except Exception as e:
@@ -122,6 +125,8 @@ class ReportSender:
         }
         post_data = urllib.parse.urlencode(data).encode('utf-8')
         request = urllib.request.Request(url, data=post_data, method='POST')
+        request.add_header("User-Agent", USER_AGENT)
+
         try:
             self.opener.open(request)
         except Exception as e:

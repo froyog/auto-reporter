@@ -7,7 +7,8 @@ TwT Auto Reporter
 安装
 ====
 
-1. 通过 pip 安装::
+0. `安装 Python <https://www.python.org/downloads/>`_
+1. 通过 pip 安装此脚本::
 
     pip install auto-Reporter
 
@@ -37,6 +38,11 @@ TwT Auto Reporter
 3. (``install-auto-reporter``) 时忘记指定用户名和密码了，请重新安装。
 4. 如何重新安装？删除 (``<PORJECT>/.git/hooks/pre-push``) 文件，然后执行 (``install-auto-reporter -u <username> -p <password> -d <project-name>``)
 5. 如果由于各种原因（服务器爆炸等）没有提交周报，你仍然可以继续 push 修改到远程库，但本次 push 的所有 commits 不会再有机会提交到周报，请自行更新周报。
+
+运行环境
+========
+
+Python 3.3+
 
 LICENSE
 =======
