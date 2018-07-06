@@ -99,4 +99,5 @@ def main(argv, dir_name):
         }
         if not valid[continue_push]:
             print('Aborting...')
-            sys.exit(1)
+            return 1
+        return 0
