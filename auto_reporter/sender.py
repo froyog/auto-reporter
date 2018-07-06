@@ -4,7 +4,7 @@ import urllib.error
 import http.cookiejar
 from html.parser import HTMLParser
 
-USER_AGENT = 'Python-urllib/3.6 AutoReporter/0.1.5'
+USER_AGENT = 'Python-urllib/3.6 AutoReporter/0.1.6'
 
 class ATError(Exception):
     def __init__(self, error_msg):
