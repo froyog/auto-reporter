@@ -10,11 +10,8 @@ def main():
     )
 
     with open(hook_file_path, 'w') as fd:
-        content = '%s -c "import sys; import auto-reporter.hook; sys.exit(auto-reporter.main(%s))" $@\n' % (sys.executable, sys.argv[1:])
+        content = '%s -c "import sys; import os; import twt-auto-reporter.hook; sys.exit(twt-auto-reporter.main(%s, os.path.split(os.getcwd())[1]))" $@\n' % (sys.executable, sys.argv[1:])
         fd.write(content)
     os.chmod(hook_file_path, stat.S_IRWXU | stat.S_IRGRP | stat.S_IROTH)
 
-    sys.stdout.write('pre-push hook installed.\n')
-
-if __name__ == '__main__':
-    main()
+    sys.stdout.write('Auto report installed.\n')

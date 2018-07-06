@@ -1,3 +1,6 @@
+# Testing only
+pre-push.py
+
 # Byte-compiled / optimized / DLL files
 __pycache__/
 *.py[cod]

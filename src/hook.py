@@ -58,12 +58,14 @@ def generate_report(report_array, title, body):
         new_report_array.insert(2, body)
         return new_report_array
     else:
-        raise
+        raise ATError('More than one title found in old report')
 
-def main(argv):
+def main(argv, dir_name):
     display_name, username, password = get_params(argv)
     if not username or not password:
         print('username and password must be specificated.')
+    if not display_name:
+        display_name = dir_name
     commit_msgs = get_commit_msgs()
     if not commit_msgs or len(commit_msgs) == 0:
         print('Nothing to push. Did you commit before pushing?')
@@ -81,11 +83,12 @@ def main(argv):
         new_report_array = generate_report(report_array, title, body_string)
         new_report = ''.join(new_report_array)
         AT.write(new_report)
+        print('Success!')
     except ATError as e:
         print('Something bad happens:\n%s' % e)
         print('But you can still trying to push your commit to your remote server.')
         print('Notice: If you choose to continue, auto-reporter will NOT recive these commits next time, you\'ll have to manually add them to your report.')
-        continue_push = input('Continue? [Y/n]').lower()
+        continue_push = input('Continue? [Y/n] ').lower()
         valid = {
             '': True,
             'y': True,
@@ -95,4 +98,5 @@ def main(argv):
             'no': False
         }
         if not valid[continue_push]:
+            print('Aborting...')
             sys.exit(1)
