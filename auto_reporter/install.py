@@ -10,7 +10,7 @@ def main():
     )
 
     with open(hook_file_path, 'w') as fd:
-        content = '%s -c "import sys; import os; import auto-reporter.hook; sys.exit(auto-reporter.main(%s, os.path.split(os.getcwd())[1]))" $@\n' % (sys.executable, sys.argv[1:])
+        content = '%s -c "import sys; import os; import auto_reporter.hook; sys.exit(auto_reporter.hook.main(%s, os.path.split(os.getcwd())[1]))" $@\n' % (sys.executable, sys.argv[1:])
         fd.write(content)
     os.chmod(hook_file_path, stat.S_IRWXU | stat.S_IRGRP | stat.S_IROTH)
 

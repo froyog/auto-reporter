@@ -18,7 +18,7 @@ URL = 'https://github.com/froyog/auto-reporter'
 EMAIL = 'scarlet0345@gmail.com'
 AUTHOR = 'froyog'
 REQUIRES_PYTHON = '>=3.0.0'
-VERSION = '0.1.0'
+VERSION = '0.1.2'
 
 # What packages are required for this module to be executed?
 REQUIRED = [
@@ -106,9 +106,11 @@ setup(
     # If your package is a single module, use this instead of 'packages':
     # py_modules=['mypackage'],
 
-    # entry_points={
-    #     'console_scripts': ['mycli=mymodule:cli'],
-    # },
+    entry_points={
+        'console_scripts': [
+            'install-auto-reporter = auto_reporter.install:main',
+        ],
+    },
     install_requires=REQUIRED,
     extras_require=EXTRAS,
     include_package_data=True,
