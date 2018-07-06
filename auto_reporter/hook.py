@@ -39,8 +39,17 @@ def get_params(argv):
 def get_commit_msgs():
     for line in sys.stdin:
         local_ref, local_sha1, remote_ref, remote_sha1 = line.strip().split(' ')
+        first_commit_sha1 = None
+        if 'tags' in local_ref or 'tags' in remote_ref:
+            return 'tags'
+        if remote_sha1 == '0000000000000000000000000000000000000000':
+            first_commit_sha1 = subprocess.check_output(
+                ['git', 'rev-list', '--max-parents=0', 'HEAD']
+            )
+        since = first_commit_sha1 if first_commit_sha1 else remote_sha1
+        until = local_sha1
         raw_messages = subprocess.check_output(
-            ['git', 'show', '--format=%s', '-s', "%s..%s" % (remote_sha1, local_sha1)]
+            ['git', 'show', '--format=%s', '-s', "%s..%s" % (since, until)]
         )
         return raw_messages.decode('utf-8').splitlines()
     return None
@@ -62,14 +71,17 @@ def generate_report(report_array, title, body):
         raise ATError('More than one title found in old report')
 
 def main(argv, dir_name):
+    commit_msgs = get_commit_msgs()
+    if commit_msgs == 'tags':
+        return 0
+    if not commit_msgs or len(commit_msgs) == 0:
+        print('Nothing to push. Did you commit before pushing?')
+    
     display_name, username, password = get_params(argv)
     if not username or not password:
         print('username and password must be specificated.')
     if not display_name:
         display_name = dir_name
-    commit_msgs = get_commit_msgs()
-    if not commit_msgs or len(commit_msgs) == 0:
-        print('Nothing to push. Did you commit before pushing?')
     
     try:
         title = '## %s\r\n' % display_name
