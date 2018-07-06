@@ -1,5 +1,6 @@
 import urllib.request
 import urllib.parse
+import urllib.error
 import http.cookiejar
 from html.parser import HTMLParser
 
@@ -77,30 +78,33 @@ class ReportSender:
         url = 'https://at.twtstudio.com/login'
         print('Loggin into %s...' % url)
 
-        token_res = self.opener.open(url)
-        token = self.parse_token(token_res.read().decode('utf-8'))
-        if not token:
-            print('Failed to parse token from %s. Aborting' % url)
-            raise ATError('token not found')
-        data = {
-            'token': token,
-            'username': username,
-            'password': password
-        }
-        post_data = urllib.parse.urlencode(data).encode('utf-8')
-        login_req = urllib.request.Request(url, data=post_data, method='POST')
         try:
+            token_res = self.opener.open(url)
+            token = self.parse_token(token_res.read().decode('utf-8'))
+            if not token:
+                print('Failed to parse token from %s. Aborting' % url)
+                raise ATError('token not found')
+            data = {
+                'token': token,
+                'username': username,
+                'password': password
+            }
+            post_data = urllib.parse.urlencode(data).encode('utf-8')
+            login_req = urllib.request.Request(url, data=post_data, method='POST')
             self.opener.open(login_req)
         except Exception as e:
-            raise ATError(e)
+            raise ATError(str(e))
 
     def get_content(self):
         url = 'https://at.twtstudio.com/report/write'
         print('Fetching present weekly report...')
-
-        request = urllib.request.Request(url)
-        response = self.opener.open(request).read().decode('utf-8')
-        write_token = self.parse_token(response)
+        try:
+            request = urllib.request.Request(url)
+            response = self.opener.open(request).read().decode('utf-8')
+            write_token = self.parse_token(response)
+        except Exception as e:
+            raise ATError(str(e))
+        
         if not write_token:
             print('Failed to parse token from %s. Aborting...' % url)
             raise ATError('token not found')
@@ -121,5 +125,5 @@ class ReportSender:
         try:
             self.opener.open(request)
         except Exception as e:
-            raise ATError(e)
+            raise ATError(str(e))
     
