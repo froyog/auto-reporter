@@ -2,8 +2,8 @@ import sys
 import subprocess
 import getopt
 import re
-from sender import ReportSender
-from sender import ATError
+from .sender import ReportSender
+from .sender import ATError
 
 def get_params(argv):
     display_name = ''
