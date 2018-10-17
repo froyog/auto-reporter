@@ -30,6 +30,7 @@ def get_params(argv):
             username = arg
         if opt in ('-p', '--password'):
             password = arg
+            
 
     if not username or not password:
         print('username and password *MUST* be specificed')
