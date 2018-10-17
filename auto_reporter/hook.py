@@ -1,5 +1,6 @@
 import sys
 import subprocess
+import os
 import getopt
 import re
 from .sender import ReportSender
@@ -30,7 +31,6 @@ def get_params(argv):
             username = arg
         if opt in ('-p', '--password'):
             password = arg
-            
 
     if not username or not password:
         print('username and password *MUST* be specificed')
@@ -52,6 +52,11 @@ def get_commit_msgs():
         return raw_messages.decode('utf-8').splitlines()
     return None
 
+def get_working_driectory():
+    full_path = subprocess.check_output(['git', 'rev-parse', '--show-toplevel']).decode('utf-8')
+    project_name = os.path.basename(full_path).strip('\n')
+    return project_name
+
 def generate_report(report_array, title, body):
     new_report_array = report_array[:]
     if len(report_array) == 1:
@@ -68,7 +73,7 @@ def generate_report(report_array, title, body):
     else:
         raise ATError('More than one title found in old report')
 
-def main(argv, dir_name):
+def main(argv):
     commit_msgs = get_commit_msgs()
     if commit_msgs == 'tags':
         return 0
@@ -79,7 +84,7 @@ def main(argv, dir_name):
     if not username or not password:
         print('username and password must be specificated.')
     if not display_name:
-        display_name = dir_name
+        display_name = get_working_driectory()
     
     try:
         title = '## %s\r\n' % display_name
