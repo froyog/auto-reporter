@@ -18,7 +18,7 @@ URL = 'https://github.com/froyog/auto-reporter'
 EMAIL = 'scarlet0345@gmail.com'
 AUTHOR = 'froyog'
 REQUIRES_PYTHON = '>=3.3.0'
-VERSION = '0.1.7'
+VERSION = '0.2.0'
 
 # What packages are required for this module to be executed?
 REQUIRED = [
