@@ -30,10 +30,11 @@ def get_params(argv):
             username = arg
         if opt in ('-p', '--password'):
             password = arg
-        if opt == '--thanks':
-            print('mua')
-            sys.exit(0)
 
+    if not username or not password:
+        print('username and password *MUST* be specificed')
+        print('install abort. Install again with these params')
+        sys.exit(0)
     return (display_name, username, password)
 
 def get_commit_msgs():
